@@ -13,13 +13,19 @@ def collate_fn(dataset_items: list[dict]):
         result_batch (dict[Tensor]): dict, containing batch-version
             of the tensors.
     """
+    batch_size = len(dataset_items)
+    max_audio_length = dataset_items[0]["audio"].shape[1]
+    max_mel_length = dataset_items[0]["spectrogram"].shape[1]
+    result_batch = {
+        "audio": torch.zeros((batch_size, max_audio_length)),
+        "spectrogram": torch.zeros((batch_size, 80, max_mel_length)),
+        "audio_path": [""] * batch_size,
+    }
 
-    result_batch = {}
-
-    # example of collate_fn
-    result_batch["data_object"] = torch.vstack(
-        [elem["data_object"] for elem in dataset_items]
-    )
-    result_batch["labels"] = torch.tensor([elem["labels"] for elem in dataset_items])
+    for i in range(batch_size):
+        audio = dataset_items[i]["audio"].squeeze()
+        result_batch["audio"][i, : len(audio)] = audio
+        result_batch["spectrogram"][i] = dataset_items[i]["spectrogram"]
+        result_batch["audio_path"][i] = dataset_items[i]["audio_path"]
 
     return result_batch

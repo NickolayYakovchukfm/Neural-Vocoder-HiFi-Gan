@@ -1,4 +1,29 @@
-defaults:
-  - batch_transforms: example
-  - instance_transforms: example
-  - _self_
+train:
+  spectrogram:
+    _target_: src.transforms.MelSpectrogram
+    sample_rate: 22050
+    n_fft: 1024
+    hop_length: 256
+    n_mels: 80
+inference:
+  spectrogram:
+    _target_: src.transforms.MelSpectrogram
+    sample_rate: 22050
+    n_fft: 1024
+    hop_length: 256
+    n_mels: 80
+batch_transforms:
+  train:
+    spectrogram:
+      _target_: src.transforms.MelSpectrogram
+      sample_rate: 22050
+      n_fft: 1024
+      hop_length: 256
+      n_mels: 80
+  inference:
+    spectrogram:
+      _target_: src.transforms.MelSpectrogram
+      sample_rate: 22050
+      n_fft: 1024
+      hop_length: 256
+      n_mels: 80

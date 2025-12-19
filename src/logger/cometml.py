@@ -189,7 +189,7 @@ class CometMLWriter:
             audio (Path | ndarray): audio in the CometML-friendly format.
             sample_rate (int): audio sample rate.
         """
-        audio = audio.detach().cpu().numpy().T
+        audio = audio.detach().cpu().float().numpy().T
         self.exp.log_audio(
             file_name=self._object_name(audio_name),
             audio_data=audio,

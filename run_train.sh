@@ -1,0 +1,21 @@
+export COMET_API_KEY="x49hnrC7hy5M0xxzTUQBAlVrM"
+
+python3 train.py -cn=train.yaml \
+    model=hifigan_train \
+    datasets=ljspeech \
+    dataloader.batch_size=4 \
+    dataloader.num_workers=8 \
+    loss=hifigan \
+    optimizer=optimizer \
+    lr_scheduler=lr_scheduler \
+    trainer.override=True \
+    transforms=example \
+    writer=cometml \
+    writer.run_name="hifigan_test" \
+    trainer.n_epochs=10000 \
+    trainer.save_period=5 \
+    trainer.monitor="min g_loss" \
+    trainer.early_stop=10000 \
+    trainer.save_dir="saved" \
+    trainer.device="auto" \
+    trainer.max_grad_norm=15

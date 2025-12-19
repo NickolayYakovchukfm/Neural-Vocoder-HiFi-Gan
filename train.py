@@ -1,3 +1,4 @@
+import os
 import warnings
 
 import hydra
@@ -8,11 +9,13 @@ from omegaconf import OmegaConf
 from src.datasets.data_utils import get_dataloaders
 from src.trainer import Trainer
 from src.utils.init_utils import set_random_seed, setup_saving_and_logging
+from src.utils.utils import get_losses, get_lr_schedulers, get_optimizers
 
 warnings.filterwarnings("ignore", category=UserWarning)
+os.environ["HYDRA_FULL_ERROR"] = "1"
 
 
-@hydra.main(version_base=None, config_path="src/configs", config_name="baseline")
+@hydra.main(version_base=None, config_path="src/configs", config_name="train")
 def main(config):
     """
     Main script for training. Instantiates the model, optimizer, scheduler,
@@ -42,24 +45,21 @@ def main(config):
     logger.info(model)
 
     # get function handles of loss and metrics
-    loss_function = instantiate(config.loss_function).to(device)
+    loss_functions = get_losses(config, device)
     metrics = instantiate(config.metrics)
 
     # build optimizer, learning rate scheduler
-    trainable_params = filter(lambda p: p.requires_grad, model.parameters())
-    optimizer = instantiate(config.optimizer, params=trainable_params)
-    lr_scheduler = instantiate(config.lr_scheduler, optimizer=optimizer)
+    optimizers = get_optimizers(config, model)
+    lr_schedulers = get_lr_schedulers(config, optimizers)
 
-    # epoch_len = number of iterations for iteration-based training
-    # epoch_len = None or len(dataloader) for epoch-based training
     epoch_len = config.trainer.get("epoch_len")
 
     trainer = Trainer(
         model=model,
-        criterion=loss_function,
+        criterion=loss_functions,
         metrics=metrics,
-        optimizer=optimizer,
-        lr_scheduler=lr_scheduler,
+        optimizer=optimizers,
+        lr_scheduler=lr_schedulers,
         config=config,
         device=device,
         dataloaders=dataloaders,
