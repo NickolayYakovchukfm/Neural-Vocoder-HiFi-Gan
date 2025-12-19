@@ -1,4 +1,4 @@
-export COMET_API_KEY="x49hnrC7hy5M0xxzTUQBAlVrM"
+export COMET_API_KEY="comet_key"
 
 python3 train.py -cn=train.yaml \
     model=hifigan_train \
